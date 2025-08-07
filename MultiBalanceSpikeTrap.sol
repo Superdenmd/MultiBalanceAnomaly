@@ -15,6 +15,7 @@ contract MultiBalanceSpikeTrap is ITrap {
 
     uint256 public constant THRESHOLD_BASIS_POINTS = 1;
     uint256 public constant BASIS_POINTS_DIVISOR = 10_000;
+    uint256 public constant MIN_DIFF_WEI = 1 ether;
 
     function collect() external view override returns (bytes memory) {
         uint256[] memory balances = new uint256[](targets.length);
@@ -25,13 +26,13 @@ contract MultiBalanceSpikeTrap is ITrap {
     }
 
     function shouldRespond(bytes[] calldata data) external pure override returns (bool, bytes memory) {
-        if (data.length < 2) return (false, "Insufficient data");
+        if (data.length < 2) return (false, abi.encode("Insufficient data"));
 
         uint256[] memory current = abi.decode(data[0], (uint256[]));
         uint256[] memory previous = abi.decode(data[1], (uint256[]));
 
         if (current.length != previous.length || current.length != 3) {
-            return (false, "Mismatched array lengths");
+            return (false, abi.encode("Mismatched array lengths"));
         }
 
         for (uint256 i = 0; i < 3; i++) {
@@ -41,14 +42,16 @@ contract MultiBalanceSpikeTrap is ITrap {
             if (oldBal == 0) continue;
 
             uint256 diff = newBal > oldBal ? newBal - oldBal : oldBal - newBal;
-            uint256 changeBp = (diff * BASIS_POINTS_DIVISOR) / oldBal;
+            if (diff < MIN_DIFF_WEI) continue;
 
+            uint256 changeBp = (diff * BASIS_POINTS_DIVISOR) / oldBal;
             if (changeBp >= THRESHOLD_BASIS_POINTS) {
-                return (true, abi.encodePacked("Anomaly at index: ", bytes1(uint8(i))));
+                return (true, abi.encode(i, oldBal, newBal));
             }
         }
 
-        return (false, "");
+        return (false, abi.encode("No anomaly detected"));
     }
 }
+
 
