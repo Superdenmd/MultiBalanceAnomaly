@@ -1,7 +1,18 @@
 # MultiBalanceAnomaly
 balance-anomaly-sergeant-trap
 # Objective 
-"This trap detects abnormal balance changes (≥0.01%) across three critical Ethereum addresses, signaling potential large transfers or suspicious activity."
+Functions of the Trap:
+Monitors three wallet addresses.
+
+Collects ETH balances for these addresses on every block.
+
+Compares current and previous balances.
+
+Calculates difference and percentage change (threshold: 0.01%).
+
+Ignores "dust" changes smaller than 1 ether.
+
+If change exceeds threshold, it flags an anomaly.
 # Problem
 Ethereum wallets involved in DAO treasury management, DeFi protocol control, or asset distribution are expected to maintain a stable balance. Any sudden or unexplained change — whether a decrease or increase — may indicate a compromise, operator error, or malicious behavior
 Solution: This trap monitors ETH balance changes on selected wallets on a per-block basis. If even a slight deviation is detected, it triggers an immediate response — enabling early detection and mitigation of potential threats.
