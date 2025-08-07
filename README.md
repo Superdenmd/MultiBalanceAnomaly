@@ -105,7 +105,7 @@ response_function = "logAnomaly(string)"
 
 Wait for any target address to process a transaction on the Ethereum Hoodi testnet.
 
-Wait 1-5 blocks.
+Wait until there are no changes in the balance of the controlled addresses.
 
 View Drosera operator logs:
 
